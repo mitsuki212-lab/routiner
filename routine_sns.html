@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routinr</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0eefb;
+  --surface:#ffffff;
+  --surface2:#f7f5fd;
+  --border:rgba(100,80,200,0.08);
+  --border-md:rgba(100,80,200,0.15);
+  --border-strong:rgba(100,80,200,0.28);
+  --text:#1e1830;
+  --text-s:#6a6280;
+  --text-m:#b0a8c8;
+  --accent:#5c35cc;
+  --accent-light:#ebe5ff;
+  --tag-bg:#e8e2f8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP','メイリオ',Meiryo,'ヒラギノ角ゴ Pro',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ── */
+.header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border-md);
+  padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:54px;position:sticky;top:0;z-index:200;
+}
+.logo{font-family:'DM Mono',monospace;font-size:18px;font-weight:400;letter-spacing:.5px;color:var(--text);}
+.logo em{color:var(--accent);font-style:normal;}
+.header-r{display:flex;gap:8px;align-items:center;}
+.btn-post{
+  background:var(--accent);color:#fff;border:none;
+  padding:7px 16px;border-radius:6px;
+  font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;letter-spacing:.3px;transition:opacity .15s;
+}
+.btn-post:hover{opacity:.88;}
+.ico-btn{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--border-md);background:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;color:var(--text-s);transition:background .15s;
+}
+.ico-btn:hover{background:var(--tag-bg);}
+
+/* ── LAYOUT ── */
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:210px 1fr 250px;min-height:calc(100vh - 54px);}
+
+/* ── LEFT SIDEBAR ── */
+.sl{padding:22px 12px;border-right:1px solid var(--border);background:var(--surface);}
+.nav-sec{margin-bottom:24px;}
+.nav-lbl{font-size:9px;font-weight:500;letter-spacing:2px;color:var(--text-m);text-transform:uppercase;padding:0 10px;margin-bottom:6px;display:block;}
+.nav-i{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text-s);transition:all .12s;margin-bottom:1px;}
+.nav-i:hover{background:var(--tag-bg);color:var(--text);}
+.nav-i.on{background:var(--accent-light);color:var(--accent);font-weight:500;}
+
+/* ── FILTER BAR ── */
+.filter-bar{padding:16px 20px 2px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.fl{font-size:10px;color:var(--text-m);margin-right:3px;letter-spacing:.5px;}
+.chip{
+  padding:3px 11px;border-radius:4px;font-size:11px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border-md);
+  background:var(--surface);color:var(--text-s);
+  transition:all .12s;white-space:nowrap;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* ── FEED ── */
+.feed{padding:0 18px 60px;}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border-md);
+  border-radius:12px;
+  margin:14px 0;
+  overflow:hidden;
+  transition:box-shadow .18s;
+}
+.card:hover{box-shadow:0 6px 28px rgba(0,0,0,.06);}
+
+/* card header */
+.card-hd{padding:16px 18px 12px;display:flex;align-items:flex-start;gap:11px;}
+.ava{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.u-meta{flex:1;min-width:0;}
+.u-name{font-size:16px;font-weight:bold;letter-spacing:.2px;}
+.u-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.tag{font-size:11px;padding:3px 8px;border-radius:4px;font-weight:bold;white-space:nowrap;letter-spacing:.2px;}
+.tg{background:#f0e8f5;color:#6b2e8a;}
+.ta{background:#f5ede8;color:#7a3e22;}
+.tj{background:#e8edf5;color:#2e4e7a;}
+.ptime{font-size:10px;color:var(--text-m);flex-shrink:0;letter-spacing:.3px;}
+
+/* children panel */
+.cp{margin:0 18px 12px;padding:9px 12px;background:#fdf8ee;border:1px solid #ead898;border-radius:8px;}
+.cp-hd{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.cp-lbl{font-size:9px;font-weight:500;letter-spacing:1.8px;color:#907020;text-transform:uppercase;}
+.cp-n{font-size:10px;color:#907020;background:#f5e098;border-radius:3px;padding:1px 7px;font-weight:500;}
+.cp-row{display:flex;flex-wrap:wrap;gap:7px;}
+.c-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#fff;border:1px solid #e8d090;border-radius:20px;
+  padding:4px 10px 4px 7px;
+}
+.c-ico{font-size:18px;line-height:1;}
+.c-age{font-size:12px;font-weight:500;color:#5a3010;}
+.c-gb{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:500;letter-spacing:.3px;}
+.gm{background:#ddeeff;color:#1a4488;}
+.gf{background:#ffddee;color:#881a44;}
+.go{background:#eeeedd;color:#555533;}
+.c-sc{font-size:9px;color:#a07030;margin-left:2px;}
+
+/* comment */
+.c-cmt{margin:0 18px 12px;font-size:13px;color:var(--text-s);line-height:1.7;padding:9px 13px;background:var(--surface2);border-radius:8px;}
+.c-cmt strong{color:var(--text);font-weight:bold;}
+
+/* ── TIMELINE ── */
+.tl-wrap{padding:4px 18px 20px;}
+
+/* callout label */
+.tl-callout{
+  position:absolute;
+  display:flex;flex-direction:column;justify-content:center;
+  height:30px;
+  padding:0 10px;
+  border-radius:4px;
+  background:var(--surface);
+  border:1px solid var(--border-md);
+  overflow:hidden;
+  cursor:default;
+  transition:border-color .15s, box-shadow .15s;
+}
+.tl-callout:hover{
+  border-color:var(--border-strong);
+  box-shadow:0 2px 10px rgba(0,0,0,.07);
+  z-index:10;
+}
+.tl-callout-time{
+  font-family:'DM Mono',monospace;
+  font-size:8px;
+  color:var(--text-m);
+  line-height:1.2;
+  white-space:nowrap;
+  letter-spacing:.3px;
+}
+.tl-callout-name{
+  font-size:11px;
+  font-weight:500;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.3;
+  letter-spacing:.1px;
+}
+
+/* tooltip */
+.tooltip{
+  position:fixed;
+  background:var(--text);color:#fff;
+  font-size:11px;padding:5px 10px;border-radius:5px;
+  pointer-events:none;z-index:400;
+  white-space:nowrap;opacity:0;transition:opacity .1s;
+  font-family:'DM Mono',monospace;letter-spacing:.3px;
+}
+.tooltip.show{opacity:1;}
+
+/* card footer */
+.card-ft{padding:9px 18px 13px;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;}
+.act-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-s);display:flex;align-items:center;gap:4px;padding:3px 0;transition:color .12s;letter-spacing:.2px;}
+.act-btn:hover{color:var(--accent);}
+.act-btn.liked{color:#c94060;}
+
+/* ── RIGHT SIDEBAR ── */
+.sr{padding:22px 16px;border-left:1px solid var(--border);background:var(--surface);}
+.sr-sec{margin-bottom:26px;}
+.sr-hd{font-size:9px;font-weight:500;letter-spacing:2px;color:var(--text-m);text-transform:uppercase;margin-bottom:12px;}
+.stat-g{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.stat-c{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.stat-n{font-size:19px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1;}
+.stat-l{font-size:9px;color:var(--text-m);margin-top:3px;letter-spacing:.5px;}
+.tr-i{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.tr-i:last-child{border-bottom:none;}
+.tr-n{font-size:12px;font-weight:500;}
+.tr-c{font-size:10px;color:var(--text-m);font-family:'DM Mono',monospace;}
+.lg-r{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-s);margin-bottom:5px;}
+.lg-d{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border-radius:14px;width:590px;max-width:96vw;max-height:92vh;overflow-y:auto;transform:translateY(16px);transition:transform .18s;}
+.overlay.open .modal{transform:translateY(0);}
+.m-hd{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.m-title{font-size:15px;font-weight:500;letter-spacing:.2px;}
+.m-cls{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-s);line-height:1;}
+.m-body{padding:18px 22px;}
+.f-row{margin-bottom:13px;}
+.f-row2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px;}
+.f-lbl{font-size:10px;font-weight:500;color:var(--text-s);margin-bottom:4px;display:block;letter-spacing:.5px;text-transform:uppercase;}
+.f-in,.f-sel{
+  width:100%;padding:8px 10px;
+  border:1px solid var(--border-md);border-radius:6px;
+  font-family:'Noto Sans JP',sans-serif;font-size:13px;
+  color:var(--text);background:var(--surface);
+  outline:none;transition:border-color .12s;
+}
+.f-in:focus,.f-sel:focus{border-color:var(--accent);}
+.sec-div{font-size:10px;font-weight:500;letter-spacing:1.5px;color:var(--text-m);text-transform:uppercase;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.c-entry{display:grid;grid-template-columns:85px 70px 1fr 26px;gap:7px;align-items:center;margin-bottom:7px;}
+.e-grid{display:grid;grid-template-columns:72px 1fr 118px 26px;gap:7px;align-items:center;margin-bottom:7px;}
+.btn-add{background:none;border:1px dashed var(--border-md);border-radius:6px;width:100%;padding:7px;font-size:11px;color:var(--text-s);cursor:pointer;transition:all .12s;font-family:'Noto Sans JP',sans-serif;letter-spacing:.3px;}
+.btn-add:hover{border-color:var(--accent);color:var(--accent);}
+.btn-rm{background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-m);padding:0;line-height:1;}
+.btn-rm:hover{color:#c94040;}
+.m-ft{padding:13px 22px 17px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:9px;}
+.btn-cnl{background:none;border:1px solid var(--border-md);padding:8px 17px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--text-s);font-family:'Noto Sans JP',sans-serif;}
+.btn-sub{background:var(--accent);border:none;padding:8px 20px;border-radius:6px;font-size:13px;cursor:pointer;color:#fff;font-weight:500;font-family:'Noto Sans JP',sans-serif;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">routine<em>r</em></div>
+  <div class="header-r">
+    <button class="ico-btn">🔍</button>
+    <button class="ico-btn">🔔</button>
+    <button class="btn-post" onclick="openModal()">＋ 投稿する</button>
+    <button class="ico-btn" style="width:auto;padding:0 12px;border-radius:6px;font-size:12px;font-weight:500;">私</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- LEFT -->
+<aside class="sl">
+  <div class="nav-sec">
+    <span class="nav-lbl">Menu</span>
+    <div class="nav-i on">🏠　ホーム</div>
+    <div class="nav-i">🔍　探す</div>
+    <div class="nav-i">📊　統計</div>
+    <div class="nav-i">🔖　保存済み</div>
+    <div class="nav-i">👤　プロフィール</div>
+  </div>
+  <div class="nav-sec">
+    <span class="nav-lbl">職業</span>
+    <div class="nav-i">💻　エンジニア</div>
+    <div class="nav-i">🎨　デザイナー</div>
+    <div class="nav-i">🏥　医師・看護師</div>
+    <div class="nav-i">📚　学生</div>
+    <div class="nav-i">🖊️　フリーランス</div>
+    <div class="nav-i">👶　主婦・主夫</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+  <div class="filter-bar">
+    <span class="fl">性別</span>
+    <div class="chip on" onclick="toggleChip(this)">すべて</div>
+    <div class="chip" onclick="toggleChip(this)">男性</div>
+    <div class="chip" onclick="toggleChip(this)">女性</div>
+    <div class="chip" onclick="toggleChip(this)">その他</div>
+    <span class="fl" style="margin-left:8px;">子供</span>
+    <div class="chip" onclick="toggleChip(this)">あり</div>
+    <div class="chip" onclick="toggleChip(this)">なし</div>
+    <span class="fl" style="margin-left:8px;">年代</span>
+    <div class="chip" onclick="toggleChip(this)">20代</div>
+    <div class="chip" onclick="toggleChip(this)">30代</div>
+    <div class="chip" onclick="toggleChip(this)">40代</div>
+  </div>
+  <div class="feed" id="feed"></div>
+</main>
+
+<!-- RIGHT -->
+<aside class="sr">
+  <div class="sr-sec">
+    <div class="sr-hd">Statistics</div>
+    <div class="stat-g">
+      <div class="stat-c"><div class="stat-n">4,821</div><div class="stat-l">登録ユーザー</div></div>
+      <div class="stat-c"><div class="stat-n">12,340</div><div class="stat-l">投稿数</div></div>
+      <div class="stat-c"><div class="stat-n">6:42</div><div class="stat-l">平均起床</div></div>
+      <div class="stat-c"><div class="stat-n">23:18</div><div class="stat-l">平均就寝</div></div>
+    </div>
+  </div>
+  <div class="sr-sec">
+    <div class="sr-hd">Trending</div>
+    <div class="tr-i"><span class="tr-n">#朝活</span><span class="tr-c">2,341</span></div>
+    <div class="tr-i"><span class="tr-n">#在宅ワーク</span><span class="tr-c">1,892</span></div>
+    <div class="tr-i"><span class="tr-n">#子育てルーティーン</span><span class="tr-c">1,204</span></div>
+    <div class="tr-i"><span class="tr-n">#医療従事者</span><span class="tr-c">876</span></div>
+    <div class="tr-i"><span class="tr-n">#フリーランス</span><span class="tr-c">743</span></div>
+    <div class="tr-i"><span class="tr-n">#筋トレ</span><span class="tr-c">621</span></div>
+  </div>
+  <div class="sr-sec">
+    <div class="sr-hd">Categories</div>
+    <div class="lg-r"><div class="lg-d" style="background:#7b5ea7;"></div>睡眠</div>
+    <div class="lg-r"><div class="lg-d" style="background:#f0920a;"></div>朝の支度</div>
+    <div class="lg-r"><div class="lg-d" style="background:#2980d4;"></div>仕事・勉強</div>
+    <div class="lg-r"><div class="lg-d" style="background:#27a85a;"></div>食事</div>
+    <div class="lg-r"><div class="lg-d" style="background:#e84040;"></div>運動</div>
+    <div class="lg-r"><div class="lg-d" style="background:#9b5de5;"></div>休憩・趣味</div>
+    <div class="lg-r"><div class="lg-d" style="background:#e8468c;"></div>家族・育児</div>
+    <div class="lg-r"><div class="lg-d" style="background:#6aab7a;"></div>その他</div>
+  </div>
+</aside>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+<div class="modal">
+  <div class="m-hd">
+    <div class="m-title">ルーティーンを投稿</div>
+    <button class="m-cls" onclick="closeModal()">×</button>
+  </div>
+  <div class="m-body">
+    <div class="f-row2">
+      <div><label class="f-lbl">ニックネーム</label><input class="f-in" id="f-name" placeholder="例：ゆかり" /></div>
+      <div><label class="f-lbl">性別</label>
+        <select class="f-sel" id="f-gender">
+          <option value="">選択</option><option>男性</option><option>女性</option><option>その他・無回答</option>
+        </select>
+      </div>
+    </div>
+    <div class="f-row2">
+      <div><label class="f-lbl">年代</label>
+        <select class="f-sel" id="f-age">
+          <option value="">選択</option>
+          <option>10代</option><option>20代</option><option>30代</option><option>40代</option><option>50代</option><option>60代以上</option>
+        </select>
+      </div>
+      <div><label class="f-lbl">職業</label>
+        <select class="f-sel" id="f-job">
+          <option value="">選択</option>
+          <option>エンジニア</option><option>デザイナー</option><option>医師・看護師</option>
+          <option>教師</option><option>フリーランス</option><option>会社員</option>
+          <option>学生</option><option>主婦・主夫</option><option>その他</option>
+        </select>
+      </div>
+    </div>
+    <div class="f-row"><label class="f-lbl">コメント（任意）</label><input class="f-in" id="f-comment" placeholder="一言メモ" /></div>
+    <div class="sec-div">子供の情報</div>
+    <div id="child-entries"></div>
+    <button class="btn-add" onclick="addChild()">＋ 子供を追加</button>
+    <div class="sec-div" style="margin-top:18px;">ルーティーン</div>
+    <div style="display:grid;grid-template-columns:72px 1fr 118px 26px;gap:7px;margin-bottom:5px;">
+      <span style="font-size:9px;color:var(--text-m);letter-spacing:.5px;text-transform:uppercase;">開始時刻</span>
+      <span style="font-size:9px;color:var(--text-m);letter-spacing:.5px;text-transform:uppercase;">活動内容</span>
+      <span style="font-size:9px;color:var(--text-m);letter-spacing:.5px;text-transform:uppercase;">カテゴリー</span>
+      <span></span>
+    </div>
+    <div id="routine-entries"></div>
+    <button class="btn-add" onclick="addEntry()">＋ ルーティーンを追加</button>
+  </div>
+  <div class="m-ft">
+    <button class="btn-cnl" onclick="closeModal()">キャンセル</button>
+    <button class="btn-sub" onclick="submitPost()">投稿する</button>
+  </div>
+</div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const CATS=[
+  {name:'睡眠',      color:'#7b5ea7'},
+  {name:'朝の支度',  color:'#f0920a'},
+  {name:'仕事・勉強',color:'#2980d4'},
+  {name:'食事',      color:'#27a85a'},
+  {name:'運動',      color:'#e84040'},
+  {name:'休憩・趣味',color:'#9b5de5'},
+  {name:'家族・育児',color:'#e8468c'},
+  {name:'その他',    color:'#6aab7a'},
+];
+
+const SLOT_H = 24; // px per hour
+const LABEL_H = 36;
+const LABEL_GAP = 4;
+
+function fh(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60);return`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;}
+function t2p(h){return h*SLOT_H;}
+
+function childEmoji(age){
+  if(age<=2)return'👶';if(age<=5)return'🧒';
+  if(age<=12)return'👦';if(age<=15)return'🧑';return'🧑‍🎓';
+}
+function genderBadge(g){
+  if(g==='male')  return`<span class="c-gb gm">男の子</span>`;
+  if(g==='female')return`<span class="c-gb gf">女の子</span>`;
+  return`<span class="c-gb go">その他</span>`;
+}
+
+function renderChildren(children){
+  if(!children||!children.length)return'';
+  const pills=children.map(c=>{
+    const age=c.age!=null?c.age:null;
+    const sc=c.school?`<span class="c-sc">${c.school}</span>`:'';
+    return`<div class="c-pill">
+      <span class="c-ico">${childEmoji(age!=null?age:5)}</span>
+      <span class="c-age">${age!=null?age+'歳':'?'}</span>
+      ${genderBadge(c.gender)}${sc}
+    </div>`;
+  }).join('');
+  return`<div class="cp">
+    <div class="cp-hd"><span class="cp-lbl">子供</span><span class="cp-n">${children.length}人</span></div>
+    <div class="cp-row">${pills}</div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+// TIMELINE — pop style
+// Fat rounded bar · bezier curves · colourful pill callouts
+// ─────────────────────────────────────────────
+function renderTimeline(routines){
+  const totalH  = 24 * SLOT_H;
+  const BAR_W   = 16;   // wider bar looks more playful
+  const AXIS_W  = 42;
+  const CURVE_X = 32;   // bezier control offset — how far right the curve swings
+  const LABEL_LEFT = CURVE_X + 6;
+
+  // Time axis
+  let axis='';
+  for(let h=0;h<=24;h+=4){
+    const top=t2p(h);
+    axis+=`<div style="position:absolute;top:${top}px;right:7px;height:0;display:flex;align-items:center;justify-content:flex-end;">
+      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-m);transform:translateY(-50%);white-space:nowrap;">${String(h).padStart(2,'0')}:00</span>
+      <div style="width:4px;height:1.5px;border-radius:1px;background:var(--border-md);margin-left:4px;flex-shrink:0;"></div>
+    </div>`;
+  }
+
+  // Bar segments — rounded on first/last, colour blocks in between with 1px gap
+  let bar='';
+  routines.forEach((r,i)=>{
+    const top = t2p(r.start);
+    const h   = t2p(r.end - r.start);
+    const isFirst = i===0, isLast = i===routines.length-1;
+    const rad = isFirst&&isLast ? `${BAR_W/2}px`
+              : isFirst         ? `${BAR_W/2}px ${BAR_W/2}px 0 0`
+              : isLast          ? `0 0 ${BAR_W/2}px ${BAR_W/2}px`
+              : '0';
+    // 1px gap between segments via top offset (except first)
+    const gapTop = isFirst ? 0 : 1;
+    bar+=`<div style="position:absolute;top:${top+gapTop}px;height:${h-gapTop}px;left:0;width:${BAR_W}px;background:${r.color};border-radius:${rad};cursor:pointer;"
+      onmouseenter="showTip(event,'${r.label}  ${fh(r.start)}–${fh(r.end)}')"
+      onmouseleave="hideTip()"></div>`;
+  });
+
+  // Stagger callout Y positions
+  const items = routines.map(r=>({
+    r,
+    anchorY: t2p(r.start) + t2p(r.end-r.start)/2,
+    placedY: t2p(r.start) + t2p(r.end-r.start)/2 - LABEL_H/2,
+  }));
+  for(let i=1;i<items.length;i++){
+    const minY=items[i-1].placedY+LABEL_H+LABEL_GAP;
+    if(items[i].placedY<minY)items[i].placedY=minY;
+  }
+  for(let i=items.length-2;i>=0;i--){
+    const maxY=items[i+1].placedY-LABEL_H-LABEL_GAP;
+    if(items[i].placedY>maxY)items[i].placedY=maxY;
+  }
+
+  const lastY = items.length ? items[items.length-1].placedY+LABEL_H+12 : totalH;
+  const colH  = Math.max(totalH, lastY);
+
+  // SVG — smooth bezier curves from bar mid-right to label left-centre
+  let svgLines='';
+  items.forEach(it=>{
+    const x1 = BAR_W;                        // bar right edge x
+    const y1 = it.anchorY;                   // anchor Y on bar
+    const x4 = LABEL_LEFT;                   // curve endpoint = exact left edge of callout
+    const y4 = it.placedY + LABEL_H/2;      // label vertical centre
+
+    const cx1 = x1 + CURVE_X * 0.8;
+    const cx2 = x4;                          // pull second control point flush to label
+
+    svgLines+=`<path d="M${x1},${y1} C${cx1},${y1} ${cx2},${y4} ${x4},${y4}"
+      fill="none" stroke="${it.r.color}" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>`;
+  });
+
+  // Colourful pill callouts — left edge = LABEL_LEFT exactly
+  let callouts='';
+  items.forEach(it=>{
+    callouts+=`<div style="
+      position:absolute;
+      top:${it.placedY}px;left:${LABEL_LEFT}px;right:6px;
+      height:${LABEL_H}px;
+      background:${it.r.color}18;
+      border:1.5px solid ${it.r.color}55;
+      border-radius:20px;
+      padding:0 12px;
+      display:flex;flex-direction:column;justify-content:center;
+      overflow:hidden;cursor:default;
+      transition:background .15s,border-color .15s,box-shadow .15s;
+    "
+    onmouseenter="this.style.background='${it.r.color}30';this.style.borderColor='${it.r.color}99';this.style.boxShadow='0 2px 10px ${it.r.color}30'"
+    onmouseleave="this.style.background='${it.r.color}18';this.style.borderColor='${it.r.color}55';this.style.boxShadow='none'">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:${it.r.color}cc;line-height:1.2;white-space:nowrap;">${fh(it.r.start)} — ${fh(it.r.end)}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;font-family:'Noto Sans JP',sans-serif;">${it.r.label}</div>
+    </div>`;
+  });
+
+  return`<div style="padding:6px 20px 22px;">
+    <div style="display:flex;align-items:flex-start;">
+      <div style="width:${AXIS_W}px;flex-shrink:0;position:relative;height:${totalH}px;">${axis}</div>
+      <div style="position:relative;flex:1;min-width:0;height:${colH}px;">
+        <div style="position:absolute;top:0;left:0;width:${BAR_W}px;height:${totalH}px;background:#ddd8f0;border-radius:${BAR_W/2}px;overflow:hidden;">${bar}</div>
+        <svg style="position:absolute;top:0;left:0;width:100%;height:${colH}px;overflow:visible;pointer-events:none;">${svgLines}</svg>
+        ${callouts}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── CARD ──
+function renderCard(p){
+  const hasChild=p.children&&p.children.length>0;
+  const cTag=hasChild?`<span class="tag" style="background:#fdf0e0;color:#905020;">👶 ${p.children.length}人</span>`:'';
+  return`<div class="card">
+    <div class="card-hd">
+      <div class="ava" style="background:${p.ava};">${p.emoji}</div>
+      <div class="u-meta">
+        <div class="u-name">${p.name}</div>
+        <div class="u-tags">
+          <span class="tag tg">${p.gender}</span>
+          <span class="tag ta">${p.age}</span>
+          <span class="tag tj">${p.job}</span>
+          ${cTag}
+        </div>
+      </div>
+      <div class="ptime">${p.postedAt}</div>
+    </div>
+    ${renderChildren(p.children)}
+    ${p.comment?`<div class="c-cmt"><strong>${p.name} —</strong> ${p.comment}</div>`:''}
+    ${renderTimeline(p.routines)}
+    <div class="card-ft">
+      <button class="act-btn" id="lb-${p.id}" onclick="toggleLike(${p.id})">♡ <span id="lc-${p.id}">${p.likes}</span></button>
+      <button class="act-btn">💬 ${p.comments}</button>
+      <button class="act-btn">↗ シェア</button>
+      <button class="act-btn">⊹ 保存</button>
+    </div>
+  </div>`;
+}
+
+function renderFeed(){document.getElementById('feed').innerHTML=posts.map(renderCard).join('');}
+function toggleLike(id){
+  const p=posts.find(x=>x.id===id),btn=document.getElementById(`lb-${id}`);
+  if(btn.classList.contains('liked')){p.likes--;btn.classList.remove('liked');btn.innerHTML=`♡ <span id="lc-${id}">${p.likes}</span>`;}
+  else{p.likes++;btn.classList.add('liked');btn.innerHTML=`♥ <span id="lc-${id}">${p.likes}</span>`;}
+}
+const tip=document.getElementById('tooltip');
+function showTip(e,t){tip.textContent=t;tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-10)+'px';tip.classList.add('show');}
+function hideTip(){tip.classList.remove('show');}
+function toggleChip(el){el.classList.toggle('on');}
+
+// MODAL
+function openModal(){
+  document.getElementById('child-entries').innerHTML='';
+  document.getElementById('routine-entries').innerHTML='';
+  addEntry();addEntry();addEntry();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function bgClose(e){if(e.target===document.getElementById('overlay'))closeModal();}
+
+let cc=0,ec=0;
+function addChild(){
+  cc++;const id=cc,d=document.createElement('div');
+  d.className='c-entry';d.id=`ce-${id}`;
+  d.innerHTML=`
+    <select class="f-sel" id="cg-${id}" style="font-size:12px;padding:7px;">
+      <option value="">性別</option><option value="male">男の子</option><option value="female">女の子</option><option value="other">その他</option>
+    </select>
+    <input class="f-in" id="ca-${id}" type="number" min="0" max="18" placeholder="年齢" style="font-size:12px;padding:7px;" />
+    <select class="f-sel" id="cs-${id}" style="font-size:12px;padding:7px;">
+      <option value="">学年</option>
+      <option>未就学</option><option>保育園・幼稚園</option>
+      <option>小学校低学年</option><option>小学校高学年</option>
+      <option>中学生</option><option>高校生</option>
+    </select>
+    <button class="btn-rm" onclick="rmEl('ce-${id}')">×</button>`;
+  document.getElementById('child-entries').appendChild(d);
+}
+function addEntry(){
+  ec++;const id=ec,d=document.createElement('div');
+  d.className='e-grid';d.id=`ee-${id}`;
+  d.innerHTML=`
+    <input class="f-in" id="et-${id}" placeholder="07:00" style="font-size:12px;padding:7px;" />
+    <input class="f-in" id="ea-${id}" placeholder="活動内容" style="font-size:12px;padding:7px;" />
+    <select class="f-sel" id="ec-${id}" style="font-size:12px;padding:7px;">
+      ${CATS.map(c=>`<option value="${c.color}|${c.name}">${c.name}</option>`).join('')}
+    </select>
+    <button class="btn-rm" onclick="rmEl('ee-${id}')">×</button>`;
+  document.getElementById('routine-entries').appendChild(d);
+}
+function rmEl(id){const el=document.getElementById(id);if(el)el.remove();}
+
+function submitPost(){
+  const name=document.getElementById('f-name').value||'匿名';
+  const gender=document.getElementById('f-gender').value||'その他・無回答';
+  const age=document.getElementById('f-age').value||'不明';
+  const job=document.getElementById('f-job').value||'その他';
+  const comment=document.getElementById('f-comment').value;
+  const children=[];
+  document.querySelectorAll('[id^="ce-"]').forEach(el=>{
+    const id=el.id.replace('ce-','');
+    const g=document.getElementById(`cg-${id}`)?.value||'other';
+    const a=document.getElementById(`ca-${id}`)?.value;
+    const s=document.getElementById(`cs-${id}`)?.value||'';
+    children.push({gender:g,age:a!==''?parseInt(a):null,school:s});
+  });
+  const raw=[];
+  document.querySelectorAll('[id^="ee-"]').forEach(el=>{
+    const id=el.id.replace('ee-','');
+    const t=document.getElementById(`et-${id}`)?.value;
+    const a=document.getElementById(`ea-${id}`)?.value;
+    const cv=(document.getElementById(`ec-${id}`)?.value||'#8a9a80|その他').split('|');
+    if(t&&a){const[h,m]=t.split(':').map(Number);raw.push({tv:h+(m||0)/60,label:a,color:cv[0],cat:cv[1]});}
+  });
+  if(!raw.length){alert('ルーティーンを1件以上追加してください');return;}
+  raw.sort((a,b)=>a.tv-b.tv);
+  const routines=raw.map((r,i)=>({start:r.tv,end:i+1<raw.length?raw[i+1].tv:24,label:r.label,cat:r.cat,color:r.color}));
+  const E=['🌿','☀️','🦋','🌙','⭐','🌺','🏔️','🎯','🌊','🍃'];
+  const A=['#f5d5b8','#b8d5f5','#d5f5b8','#f5b8d5','#d5b8f5','#f5f5b8','#b8f5f5'];
+  posts.unshift({id:Date.now(),name,gender,age,job,comment,children,
+    emoji:E[Math.floor(Math.random()*E.length)],
+    ava:A[Math.floor(Math.random()*A.length)],
+    postedAt:'たった今',likes:0,comments:0,routines});
+  renderFeed();closeModal();
+}
+
+// ── DATA ──
+const posts=[
+  {
+    id:1,name:'ゆかり',gender:'女性',age:'30代',job:'エンジニア',
+    emoji:'🌿',ava:'#d5f5b8',
+    comment:'育休復帰後のルーティーン。慌ただしいけど充実してます！',
+    postedAt:'2時間前',likes:142,comments:23,
+    children:[{gender:'female',age:1,school:'未就学'},{gender:'male',age:4,school:'保育園・幼稚園'}],
+    routines:[
+      {start:0,  end:5.5, label:'睡眠',           cat:'睡眠',      color:'#7b5ea7'},
+      {start:5.5,end:6.5, label:'子供の世話・授乳', cat:'家族・育児', color:'#e8468c'},
+      {start:6.5,end:7.5, label:'朝食・支度',       cat:'朝の支度',  color:'#f0920a'},
+      {start:7.5,end:9,   label:'保育園送り',        cat:'家族・育児',color:'#e8468c'},
+      {start:9,  end:12.5,label:'リモートワーク',    cat:'仕事・勉強',color:'#2980d4'},
+      {start:12.5,end:13.5,label:'昼食',            cat:'食事',      color:'#27a85a'},
+      {start:13.5,end:17, label:'リモートワーク',    cat:'仕事・勉強',color:'#2980d4'},
+      {start:17, end:18.5,label:'お迎え・夕食準備',  cat:'家族・育児',color:'#e8468c'},
+      {start:18.5,end:20, label:'お風呂・就寝準備',  cat:'家族・育児',color:'#e8468c'},
+      {start:20, end:21.5,label:'自分の時間',        cat:'休憩・趣味',color:'#9b5de5'},
+      {start:21.5,end:24, label:'睡眠',              cat:'睡眠',      color:'#7b5ea7'},
+    ]
+  },
+  {
+    id:2,name:'けんた',gender:'男性',age:'20代',job:'エンジニア',
+    emoji:'⭐',ava:'#b8d5f5',
+    comment:'朝活派。6時起きコーディングが一番捗ります',
+    postedAt:'5時間前',likes:98,comments:11,
+    children:[],
+    routines:[
+      {start:0,  end:6,   label:'睡眠',           cat:'睡眠',      color:'#7b5ea7'},
+      {start:6,  end:7,   label:'朝活コーディング', cat:'仕事・勉強',color:'#2980d4'},
+      {start:7,  end:8,   label:'朝食・支度',       cat:'朝の支度',  color:'#f0920a'},
+      {start:8,  end:9,   label:'通勤',             cat:'その他',    color:'#6aab7a'},
+      {start:9,  end:12,  label:'午前の仕事',        cat:'仕事・勉強',color:'#2980d4'},
+      {start:12, end:13,  label:'昼食',              cat:'食事',      color:'#27a85a'},
+      {start:13, end:18,  label:'午後の仕事',         cat:'仕事・勉強',color:'#2980d4'},
+      {start:18, end:19.5,label:'ジム',              cat:'運動',      color:'#e84040'},
+      {start:19.5,end:21, label:'夕食・休憩',         cat:'食事',      color:'#27a85a'},
+      {start:21, end:23,  label:'読書・趣味',         cat:'休憩・趣味',color:'#9b5de5'},
+      {start:23, end:24,  label:'睡眠',               cat:'睡眠',      color:'#7b5ea7'},
+    ]
+  },
+  {
+    id:3,name:'みさき',gender:'女性',age:'40代',job:'医師・看護師',
+    emoji:'🌺',ava:'#f5b8d5',
+    comment:'夜勤明けの日のルーティーン。3人の子持ちでフル稼働です',
+    postedAt:'昨日',likes:334,comments:47,
+    children:[
+      {gender:'female',age:8,school:'小学校低学年'},
+      {gender:'male',age:11,school:'小学校高学年'},
+      {gender:'female',age:14,school:'中学生'},
+    ],
+    routines:[
+      {start:0,  end:8,   label:'夜勤',              cat:'仕事・勉強',color:'#2980d4'},
+      {start:8,  end:9,   label:'帰宅・朝食',          cat:'食事',      color:'#27a85a'},
+      {start:9,  end:13,  label:'睡眠（仮眠）',         cat:'睡眠',      color:'#7b5ea7'},
+      {start:13, end:15,  label:'子供の帰宅・おやつ',   cat:'家族・育児',color:'#e8468c'},
+      {start:15, end:17,  label:'宿題サポート・送迎',   cat:'家族・育児',color:'#e8468c'},
+      {start:17, end:18.5,label:'夕食づくり',           cat:'食事',      color:'#27a85a'},
+      {start:18.5,end:20, label:'お風呂・団らん',        cat:'家族・育児',color:'#e8468c'},
+      {start:20, end:21,  label:'ストレッチ',            cat:'運動',      color:'#e84040'},
+      {start:21, end:24,  label:'睡眠',                  cat:'睡眠',      color:'#7b5ea7'},
+    ]
+  },
+  {
+    id:4,name:'ひろし',gender:'男性',age:'30代',job:'フリーランス',
+    emoji:'🎯',ava:'#d5b8f5',
+    comment:'フリーランスデザイナー3年目。1歳の息子がいて在宅ワークは戦場',
+    postedAt:'2日前',likes:201,comments:38,
+    children:[{gender:'male',age:1,school:'未就学'}],
+    routines:[
+      {start:0,  end:7,   label:'睡眠',              cat:'睡眠',      color:'#7b5ea7'},
+      {start:7,  end:8,   label:'子供の世話・朝食',   cat:'家族・育児',color:'#e8468c'},
+      {start:8,  end:9.5, label:'朝支度・SNS確認',    cat:'朝の支度',  color:'#f0920a'},
+      {start:9.5,end:12,  label:'集中作業',            cat:'仕事・勉強',color:'#2980d4'},
+      {start:12, end:13.5,label:'昼食・散歩',          cat:'食事',      color:'#27a85a'},
+      {start:13.5,end:16, label:'クライアント対応',    cat:'仕事・勉強',color:'#2980d4'},
+      {start:16, end:17.5,label:'カフェ作業',          cat:'仕事・勉強',color:'#2980d4'},
+      {start:17.5,end:19, label:'ランニング',           cat:'運動',      color:'#e84040'},
+      {start:19, end:20.5,label:'夕食・子供のお風呂',  cat:'家族・育児',color:'#e8468c'},
+      {start:20.5,end:23, label:'デザイン学習・趣味',  cat:'休憩・趣味',color:'#9b5de5'},
+      {start:23, end:24,  label:'睡眠',                cat:'睡眠',      color:'#7b5ea7'},
+    ]
+  },
+];
+
+renderFeed();
+</script>
+</body>
+</html>
